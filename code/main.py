@@ -21,22 +21,24 @@ class Game:
         self.import_assets()
         self.setup(self.tmx_maps['world'], 'house')
        # self.setup(self.tmx_maps['hospital'], 'world')
-
-        
-                    
+              
     def run(self):
 
          while(True):
+            # creating clock for game
             dt = self.clock.tick() / 1000
-            #print(self.clock.tick())
 
+            #Start main game loop
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+            #update all sprites in game
             self.all_sprites.update(dt)
             self.display_surface.fill('black')
-            self.all_sprites.draw(self.player.rect.center)        
+            #create player on screen using draw method from group
+            self.all_sprites.draw(self.player.rect.center)   
+            print(self.all_sprites.sprites)     
             pygame.display.update()
 
 
@@ -45,7 +47,8 @@ class Game:
                          'hospital': load_pygame(join('..', 'data', 'maps', 'hospital.tmx')), }
         
         self.overworld_frames = {
-            'water': import_folder('..','graphics', 'tilesets', 'water')
+            'water': import_folder('..','graphics', 'tilesets', 'water'),
+            'coast': coast_importer(24,12, '..','graphics', 'tilesets', 'coast')
         }
 
     def setup(self, tmx_map, player_start_pos):
@@ -69,6 +72,12 @@ class Game:
             for x in range(int(obj.x), int(obj.x + obj.width), TILE_SIZE):
                 for y in range(int(obj.y), int(obj.y + obj.height), TILE_SIZE):
                     AnimatedSprite((x,y), self.overworld_frames['water'], self.all_sprites)
+
+    #coast
+        for obj in tmx_map.get_layer_by_name('Coast'):
+            terrain = obj.properties['terrain']    
+            side = obj.properties['side']   
+            AnimatedSprite((obj.x, obj.y),self.overworld_frames['coast'][terrain][side],self.all_sprites)     
 
 if __name__ == "__main__":
     game = Game()
